@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>インターン生の1日</title>
+<meta name="description" content="工務店のSNS運用インターンになって1日を乗り切る3D RPG">
+<meta name="theme-color" content="#1b1f2c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="インターンRPG">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- アバター作成 -->
+  <section class="panel" id="maker">
+    <div class="title-block">
+      <div class="eyebrow">工務店SNS運用チーム RPG</div>
+      <h1>インターン生の1日</h1>
+      <p class="lead">アバターを作ってオフィスを歩き回ろう。「！」に話しかけると出来事が起きる。アイテムを拾い、モデルハウスで撮影し、17:30のボスを倒して18時の退勤をめざそう。</p>
+    </div>
+    <div class="maker">
+      <div class="preview">
+        <canvas id="pv" aria-label="アバターのプレビュー"></canvas>
+        <div class="preview-name" id="pvname">インターン</div>
+      </div>
+      <div class="opts">
+        <div><label class="opt-label" for="name">なまえ（ランキングに出ます）</label><br><input id="name" maxlength="10" value="インターン" autocomplete="off"></div>
+        <div><div class="opt-label">髪型</div><div class="row" id="o-style"></div></div>
+        <div><div class="opt-label">髪の色</div><div class="row" id="o-hair"></div></div>
+        <div><div class="opt-label">肌の色</div><div class="row" id="o-skin"></div></div>
+        <div><div class="opt-label">服の色</div><div class="row" id="o-outfit"></div></div>
+      </div>
+    </div>
+    <div class="opt-label" style="margin-top:16px">タイプ（得意なこと）</div>
+    <div class="types" id="o-type"></div>
+    <div class="opt-label" style="margin-top:16px">装備（称号をとると増える）</div>
+    <div class="equip" id="equip"></div>
+    <p class="acc-note" id="acc-note">？？？は称号をとると解放されます。押すと条件が出ます。</p>
+    <div class="toggle-row hidden" id="ai-row">
+      <span class="opt-label" style="margin:0">出来事</span>
+      <button class="pill" id="ai-off" aria-pressed="true">いつもの</button>
+      <button class="pill" id="ai-on" aria-pressed="false">AIが毎回つくる</button>
+      <span class="lead" style="font-size:13px" id="ai-note">AIモードは毎回ちがう出来事が出ます（あなたのClaudeの利用枠を少し使います）</span>
+    </div>
+    <div class="toggle-row">
+      <span class="opt-label" style="margin:0">サウンド</span>
+      <button class="pill" id="snd-maker" aria-pressed="false">オフ</button>
+      <span class="lead" style="font-size:13px">効果音とBGMが鳴ります。ゲーム中も切り替えできます</span>
+    </div>
+    <button class="primary" id="go">9:00 出社する</button>
+  </section>
+
+  <!-- ランキング（作成画面） -->
+  <section class="panel board" id="board1">
+    <div class="online" id="online1"></div>
+    <div class="board-head"><h2>ユニットランキング</h2><button class="linkbtn" id="open-titles1">称号コレクション <span id="tcount1">0/22</span></button></div>
+    <div id="rank1"></div>
+  </section>
+
+  <!-- ゲーム -->
+  <section id="game" class="hidden" style="display:grid;gap:12px">
+    <div class="hud">
+      <div class="clock" id="clock"><small id="phase">午前</small><span id="time">9:00</span></div>
+      <div class="meters">
+        <div><div class="meter-top"><span>フォロワー</span><b id="v-f">1,280</b></div><div class="bar"><i id="b-f" style="background:var(--c-f);width:0%"></i></div></div>
+        <div><div class="meter-top"><span>信頼</span><b id="v-t">50</b></div><div class="bar"><i id="b-t" style="background:var(--c-t);width:50%"></i></div></div>
+        <div><div class="meter-top"><span>体力</span><b id="v-h">70</b></div><div class="bar"><i id="b-h" style="background:var(--c-h);width:70%"></i></div></div>
+      </div>
+      <div class="who"><span id="who-name">インターン</span><span class="who-right"><span class="daybadge" id="daybadge">ふつうの日</span><span id="who-lv">Lv.1</span><button class="snd" id="snd-game" aria-pressed="false">♪ オフ</button></span></div>
+    </div>
+
+    <div class="inv" id="inv" aria-label="持ち物"></div>
+    <div class="online compact" id="online2"></div>
+
+    <div class="stage" id="stage">
+      <canvas id="map" aria-label="ゲーム画面"></canvas>
+      <div class="bhud hidden" id="bhud">
+        <div class="bh-boss"><span id="bh-name"></span><div class="bh-bar"><i id="bh-hp"></i></div></div>
+        <div class="bh-me"><span id="bh-pname"></span><div class="bh-bar"><i id="bh-php" style="background:#f0b429"></i></div></div>
+      </div>
+      <div class="flash" id="flash"></div>
+      <div class="fade" id="fade"></div>
+      <div class="toast" id="toast" style="opacity:0"></div>
+      <div class="prompt hidden" id="prompt"></div>
+    </div>
+    <div class="dialog hidden" id="dialog" aria-live="polite"></div>
+
+    <div class="pad">
+      <div class="dpad" id="dpad">
+        <button class="n" data-d="up" aria-label="上">▲</button>
+        <button class="w" data-d="left" aria-label="左">◀</button>
+        <button class="e" data-d="right" aria-label="右">▶</button>
+        <button class="s" data-d="down" aria-label="下">▼</button>
+      </div>
+      <div class="hint"><kbd>矢印</kbd>/<kbd>WASD</kbd>で移動、<kbd>Space</kbd>で話す<br>マップをタップしてもそこへ歩きます</div>
+      <button class="abtn" id="abtn" aria-label="話す・決定">A</button>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section class="panel hidden" id="end"></section>
+  <section class="panel board hidden" id="board2">
+    <div class="board-head"><h2>ユニットランキング</h2><button class="linkbtn" id="open-titles2">称号コレクション <span id="tcount2">0/22</span></button></div>
+    <div id="rank2"></div>
+  </section>
+</div>
+
+<div class="modal hidden" id="tmodal" role="dialog" aria-modal="true" aria-labelledby="tmodal-h">
+  <div class="modal-box">
+    <div class="board-head"><h2 id="tmodal-h" style="font-family:var(--display);font-weight:400;margin:0">称号コレクション</h2><button class="secondary" id="tclose" style="width:auto;padding:6px 14px">閉じる</button></div>
+    <p class="lead" style="font-size:13px;margin-top:6px" id="tsum"></p>
+    <div class="tgrid" id="tgrid"></div>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/platform.js"></script>
+<script src="js/events.js"></script>
+<script src="js/events_more.js"></script>
+<script src="js/extras.js"></script>
+<script src="js/world3d.js"></script>
+<script src="js/game.js"></script>
+<script>
+  if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); }); }
+</script>
+</body>
+</html>

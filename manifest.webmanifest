@@ -1,0 +1,17 @@
+{
+  "name": "インターン生の1日",
+  "short_name": "インターンRPG",
+  "description": "工務店のSNS運用インターンになって1日を乗り切る3D RPG",
+  "lang": "ja",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#e9edf4",
+  "theme_color": "#1b1f2c",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
